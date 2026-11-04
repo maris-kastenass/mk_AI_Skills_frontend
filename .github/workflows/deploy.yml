@@ -1,3 +1,4 @@
+
 name: Deploy to AWS S3
 
 on:
@@ -17,17 +18,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # TEMPORARY: Debug OIDC authentication
+      - name: Debug GitHub OIDC claims
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken('sts.amazonaws.com');
+            const payload = JSON.parse(
+              Buffer.from(token.split('.')[1], 'base64').toString()
+            );
+
+            console.log('OIDC issuer:', payload.iss);
+            console.log('OIDC audience:', payload.aud);
+            console.log('OIDC subject:', payload.sub);
+
+      # AWS authentication
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::977979909790:role/GitHubActionsS3SkillsFrontendDeployRole
           aws-region: us-east-1
 
+      # Build project
       - name: Build project
         run: |
           npm install
           npm run build
 
+      # Deploy to S3
       - name: Deploy to S3
         run: |
           aws s3 sync ./dist s3://mk-ai-skills-frontend --delete
