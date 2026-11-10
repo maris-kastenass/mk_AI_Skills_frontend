@@ -31,7 +31,7 @@ jobs:
             console.log('OIDC issuer:', payload.iss);
             console.log('OIDC audience:', payload.aud);
             console.log('OIDC subject:', payload.sub);
-            console.log('Update-2');
+            console.log('Update-3');
 
       # AWS authentication
       - name: Configure AWS credentials
